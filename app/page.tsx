@@ -1,65 +1,101 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
 
 export default function Home() {
+  const [items, setItems] = useState<string[]>([]);
+  const [text, setText] = useState("");
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+
+  function Add() {
+    if (text.trim() === "") 
+    {
+        return;
+    }
+
+    if (editIndex === null) 
+    {
+      setItems([...items, text]);
+    } else 
+    {
+      const newItems = [...items];
+      newItems[editIndex] = text;
+      setItems(newItems);
+      setEditIndex(null);
+    }
+
+    setText("");
+  }
+
+  function Edit(index: number) 
+  {
+    setText(items[index]);
+    setEditIndex(index);
+  }
+  function Delete(index: number) 
+  {
+    setItems(items.filter((_, i) => i !== index));
+  }
+
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="bg-white w-full max-w-md p-6 rounded-xl shadow-lg ">
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-4 sticky top-10">
+          Simple CRUD
+        </h1>
+
+        {/* Input */}
+        <div className="flex gap-2 mb-4 sticky top-10">
+          <input
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="พิมพ์ข้อมูล..."
+            className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800"
+          />
+          <button
+            onClick={Add}
+            className={`px-4 py-2 rounded-lg text-white
+              ${editIndex === null
+                ? "bg-blue-500 hover:bg-blue-600"
+                : "bg-green-500 hover:bg-green-600"}`}
+          >
+            {editIndex === null ? "เพิ่ม" : "อัปเดต"}
+          </button>
+        </div>
+
+        {/* List */}
+        <ul className="space-y-2">
+          {items.map((item, index) => (
+            <li
+              key={index}
+              className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-lg text-gray-800">
+              <span>{item}</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => Edit(index)}
+                  className="text-sm px-3 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white">
+                  แก้ไข
+                </button>
+                <button
+                  onClick={() => Delete(index)}
+                  className="text-sm px-3 py-1 rounded bg-red-500 hover:bg-red-600 text-white">
+                  ลบ
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        {items.length === 0 && (
+          <p className="text-center text-gray-400 mt-4">
+            ยังไม่มีข้อมูล
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        )}
+      </div>
+      <div>
+        
+      </div>
     </div>
   );
 }
